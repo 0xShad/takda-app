@@ -1,0 +1,35 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+
+}
+
+model Todo {
+  id String @id @default(uuid())
+  userId String 
+  user User @relation(fields: [userId], references: [id])
+  title String
+  description String?
+  is_completed Boolean @default(false)
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model User {
+  id String @id @default(uuid())
+  email String @unique
+  name String?
+  created_at DateTime @default(now())
+
+  todos Todo[]
+}
+
