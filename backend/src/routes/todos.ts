@@ -27,15 +27,17 @@ router.post("/", async (req: Request, res: Response) => {
 });
 
 router.get("/:id", async (req: Request, res: Response) => {
-  const todo = await prisma.todo.findUnique({ where: { id: req.params.id } });
+  const { id } = req.params as { id: string };
+  const todo = await prisma.todo.findUnique({ where: { id } });
   if (!todo) {
-    res.status(404).json({ error: `Todo "${req.params.id}" not found` });
+    res.status(404).json({ error: `Todo "${id}" not found` });
     return;
   }
   res.json(todo);
 });
 
 router.put("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params as { id: string };
   const { title, description, is_completed } = req.body ?? {};
 
   if (title !== undefined && (typeof title !== "string" || title.trim() === "")) {
@@ -58,11 +60,11 @@ router.put("/:id", async (req: Request, res: Response) => {
   }
 
   try {
-    const todo = await prisma.todo.update({ where: { id: req.params.id }, data });
+    const todo = await prisma.todo.update({ where: { id }, data });
     res.json(todo);
   } catch (err: any) {
     if (err?.code === "P2025") {
-      res.status(404).json({ error: `Todo "${req.params.id}" not found` });
+      res.status(404).json({ error: `Todo "${id}" not found` });
       return;
     }
     throw err;
@@ -70,12 +72,13 @@ router.put("/:id", async (req: Request, res: Response) => {
 });
 
 router.delete("/:id", async (req: Request, res: Response) => {
+  const { id } = req.params as { id: string };
   try {
-    await prisma.todo.delete({ where: { id: req.params.id } });
+    await prisma.todo.delete({ where: { id } });
     res.status(204).send();
   } catch (err: any) {
     if (err?.code === "P2025") {
-      res.status(404).json({ error: `Todo "${req.params.id}" not found` });
+      res.status(404).json({ error: `Todo "${id}" not found` });
       return;
     }
     throw err;
